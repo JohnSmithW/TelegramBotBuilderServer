@@ -2,12 +2,11 @@ const express = require('express');
 
 const router = express.Router();
 const botController = require('../controllers/bot');
+const session = require('../controllers/session');
 
 function routes() {
   router.post('/bot/create', botController.createBot);
-  router.get('/', (req,res)=>{
-     res.send('hey')
-  })
+  router.post('/isAuthorized', session.isAuthorized);
 
   return router;
 }
