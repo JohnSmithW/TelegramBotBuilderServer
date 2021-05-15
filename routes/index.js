@@ -5,7 +5,7 @@ const botController = require('../controllers/bot');
 const session = require('../controllers/session');
 
 function routes() {
-  router.post('/bot/create', botController.createBot);
+  router.post('/bot/init', botController.createBot);
   router.post('/isAuthorized', session.isAuthorized);
 
   return router;
