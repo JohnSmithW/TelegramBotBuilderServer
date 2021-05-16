@@ -1,7 +1,8 @@
 const { Telegraf } = require('telegraf');
 
-const buildScheme = (token, data) => {
-  const bot = new Telegraf(token);
+const buildScheme = (bot, data) => {
+  // const bot = new Telegraf(token);
+
   let scheme = [];
 
   scheme = data.map(action => {
@@ -46,8 +47,7 @@ const buildScheme = (token, data) => {
 
 exports.createBot = async (req, res) => {
   const { token, scheme } = req.body;
-  console.log(scheme);
-  // const bot = new Telegraf(token);
+  const bot = new Telegraf(token);
 
   if (token) {
     // bot.start(ctx => ctx.reply('Welcome'));
@@ -60,7 +60,8 @@ exports.createBot = async (req, res) => {
     // process.once('SIGINT', () => bot.stop('SIGINT'));
     // process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
-    buildScheme(token, scheme);
+    buildScheme(bot, scheme);
+    bot.handleUpdates([bot.hears('dick', ctx => ctx.reply('yes'))]);
 
     // console.log(buildScheme(token, scheme));
   }
