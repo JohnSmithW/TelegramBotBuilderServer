@@ -68,3 +68,7 @@ exports.createBot = async (req, res) => {
 
   res.send({ ok: true });
 };
+
+exports.saveBot = async (req, res) => {
+  const data = req.body;
+};
