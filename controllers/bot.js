@@ -1,4 +1,5 @@
 const { Telegraf } = require('telegraf');
+const { createScene } = require('../repositories/telegraf/scenes');
 
 const buildScheme = (bot, data) => {
   // const bot = new Telegraf(token);
@@ -71,4 +72,8 @@ exports.createBot = async (req, res) => {
 
 exports.saveBot = async (req, res) => {
   const data = req.body;
+
+  createScene(data);
+
+  res.send({ ok: true, message: 'it worked' });
 };
