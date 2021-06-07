@@ -1,5 +1,7 @@
 const { Telegraf } = require('telegraf');
-const { createScene } = require('../repositories/telegraf/scenes');
+const { createScene } = require('../repositories/telegraf/scenes/scenes');
+
+let bot = null;
 
 const buildScheme = (bot, data) => {
   // const bot = new Telegraf(token);
@@ -48,21 +50,15 @@ const buildScheme = (bot, data) => {
 
 exports.createBot = async (req, res) => {
   const { token, scheme } = req.body;
-  const bot = new Telegraf(token);
+
+  bot = new Telegraf('1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8');
+
+  bot.launch();
+  process.once('SIGINT', () => bot.stop('SIGINT'));
+  process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
   if (token) {
-    // bot.start(ctx => ctx.reply('Welcome'));
-    // bot.help(ctx => ctx.reply('Send me a sticker'));
-    // bot.on('sticker', ctx => ctx.reply('👍'));
-    // bot.hears('hi', ctx => ctx.reply('Hey there'));
-    // bot.hears('wow', ctx => ctx.reply('I know'));
-    // bot.launch();
-
-    // process.once('SIGINT', () => bot.stop('SIGINT'));
-    // process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
     buildScheme(bot, scheme);
-    bot.handleUpdates([bot.hears('dick', ctx => ctx.reply('yes'))]);
 
     // console.log(buildScheme(token, scheme));
   }
@@ -72,8 +68,12 @@ exports.createBot = async (req, res) => {
 
 exports.saveBot = async (req, res) => {
   const data = req.body;
+  bot = new Telegraf('1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8');
 
-  createScene(data);
+  createScene(data, bot);
+  bot.launch();
+  process.once('SIGINT', () => bot.stop('SIGINT'));
+  process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
   res.send({ ok: true, message: 'it worked' });
 };
