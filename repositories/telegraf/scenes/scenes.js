@@ -6,18 +6,12 @@ const {
 const { axiosGet } = require('../../../http');
 
 exports.createScene = (payload, bot) => {
-  const sceneName = `scene`;
-  let scheme = [];
-  const message = '';
+  let message = '';
   const readyScene = [];
 
-  scheme = payload.map(({ type, values }) => {
+  const scheme = payload.map(({ type, values }) => {
     switch (type) {
-      case 'START_COMMAND':
-        return Telegraf.command('/start', ctx => ctx.reply(values.response));
-
       case 'MESSAGE_COMMAND':
-        console.log('it went here');
         return Telegraf.command(`/${values.command}`, async ctx => {
           message = ctx.message.text;
 
@@ -26,7 +20,6 @@ exports.createScene = (payload, bot) => {
         });
 
       case 'API_BLOCK':
-        console.log('it went here2');
         const query = values.entrance;
 
         const response = async () => await axiosGet(query + message);
@@ -37,18 +30,31 @@ exports.createScene = (payload, bot) => {
     }
   });
 
-  const scene = new WizardScene(sceneName, scheme);
+  const scene = new WizardScene(
+    'testingScene',
+    Telegraf.command(`/gay`, async ctx => {
+      await ctx.reply('gay is alright');
+
+      return ctx.wizard.next();
+    }),
+    Telegraf.on('text', async ctx => {
+      console.log(ctx.message.chat.id, 'MESSAGE');
+      message = ctx.message.text;
+
+      return ctx.wizard.next();
+    }),
+    bot.telegram.sendMessage(ctx => ctx.message.chat.id, message),
+  );
   scene.enter();
 
   const stage = new Stage([scene]);
   stage.hears('exit', ctx => ctx.scene.leave());
 
+  bot.use(session(), stage.middleware());
+
   bot.use(
-    stage.hears('exit', ctx => ctx.scene.leave()),
-    session(),
-    stage.middleware(),
     bot.start(ctx => {
-      ctx.scene.enter(sceneName);
+      ctx.scene.enter('testingScene');
       ctx.reply('I dunno');
     }),
   );
