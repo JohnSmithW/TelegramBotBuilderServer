@@ -11,48 +11,45 @@ exports.createScene = (payload, bot) => {
   const message = '';
   const readyScene = [];
 
-  scheme = payload.map(({ type }) => {
+  scheme = payload.map(({ type, values }) => {
     switch (type) {
       case 'START_COMMAND':
-        console.log('it went here');
-        return Telegraf.command('/start', ctx => ctx.reply("it's started"));
+        return Telegraf.command('/start', ctx => ctx.reply(values.response));
 
       case 'MESSAGE_COMMAND':
-        return Telegraf.command(payload.command, async ctx => {
+        console.log('it went here');
+        return Telegraf.command(`/${values.command}`, async ctx => {
           message = ctx.message.text;
 
+          await ctx.reply(values.response);
           return ctx.wizard.next();
         });
 
       case 'API_BLOCK':
         console.log('it went here2');
-        const query = payload.entrance;
+        const query = values.entrance;
 
         const response = async () => await axiosGet(query + message);
 
-        return Telegraf.reply(response, async ctx => {
-          return ctx.scene.leave();
-        });
+        console.log(response);
+
+        return Telegraf.reply(response);
     }
   });
 
-  const scene = new WizardScene(
-    sceneName,
-    Telegraf.command('/start', ctx => ctx.reply("it's started")),
-  );
-  scene.enter(ctx => ctx.reply('hey'));
+  const scene = new WizardScene(sceneName, scheme);
+  scene.enter();
+
   const stage = new Stage([scene]);
   stage.hears('exit', ctx => ctx.scene.leave());
 
-  bot.use(stage.hears('exit', ctx => ctx.scene.leave()));
-
-  bot.use(session());
-  bot.use(stage.middleware());
   bot.use(
-    bot.on('text', ctx => {
+    stage.hears('exit', ctx => ctx.scene.leave()),
+    session(),
+    stage.middleware(),
+    bot.start(ctx => {
       ctx.scene.enter(sceneName);
+      ctx.reply('I dunno');
     }),
   );
-
-  console.log(payload, 'Is it working ?');
 };

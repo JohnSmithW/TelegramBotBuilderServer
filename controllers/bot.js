@@ -49,31 +49,23 @@ const buildScheme = (bot, data) => {
 };
 
 exports.createBot = async (req, res) => {
-  const { token, scheme } = req.body;
+  // const { token, scheme } = req.body;
 
   bot = new Telegraf('1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8');
 
-  bot.launch();
-  process.once('SIGINT', () => bot.stop('SIGINT'));
-  process.once('SIGTERM', () => bot.stop('SIGTERM'));
+  //
 
-  if (token) {
-    buildScheme(bot, scheme);
-
-    // console.log(buildScheme(token, scheme));
-  }
-
-  res.send({ ok: true });
-};
-
-exports.saveBot = async (req, res) => {
-  const data = req.body;
-  bot = new Telegraf('1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8');
-
-  createScene(data, bot);
   bot.launch();
   process.once('SIGINT', () => bot.stop('SIGINT'));
   process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
   res.send({ ok: true, message: 'it worked' });
+};
+
+exports.saveBot = async (req, res) => {
+  const data = req.body;
+
+  createScene(data, bot);
+
+  res.send({ ok: true });
 };
