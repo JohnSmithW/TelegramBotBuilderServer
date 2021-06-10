@@ -38,13 +38,8 @@ exports.createScene = (payload, bot) => {
     }
   });
 
-  const handlerOne = Telegraf.command(`/test`, async ctx => {
-    await ctx.reply('it works huh ?');
-    return ctx.wizard.next();
-  });
-
   // console.log(extractScenesFromArray(scheme));
-  const scene = new WizardScene('testingScene', ...[scheme]);
+  const scene = new WizardScene('testingScene', ...scheme);
   scene.enter();
 
   const stage = new Stage([scene]);
