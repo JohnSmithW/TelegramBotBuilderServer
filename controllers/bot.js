@@ -51,9 +51,8 @@ const buildScheme = (bot, data) => {
 exports.createBot = async (req, res) => {
   // const { token, scheme } = req.body;
 
+  //1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8
   bot = new Telegraf('1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8');
-
-  //
 
   bot.launch();
   process.once('SIGINT', () => bot.stop('SIGINT'));

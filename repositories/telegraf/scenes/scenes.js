@@ -4,20 +4,27 @@ const {
   Scenes: { WizardScene, Stage },
 } = require('telegraf');
 const { axiosGet } = require('../../../http');
+const {
+  extractScenesFromArray,
+} = require('../../../utils/bot/extractScenesFromArray');
+const { getStartCommand } = require('../../../utils/bot/getStartCommand');
 
 exports.createScene = (payload, bot) => {
   let message = '';
+  let scheme = [];
   const readyScene = [];
 
-  const scheme = payload.map(({ type, values }) => {
+  payload.forEach(({ type, values }) => {
     switch (type) {
       case 'MESSAGE_COMMAND':
-        return Telegraf.command(`/${values.command}`, async ctx => {
-          message = ctx.message.text;
+        scheme.push(
+          Telegraf.command(`/${values.command}`, async ctx => {
+            await ctx.reply(values.response);
+            return ctx.wizard.next();
+          }),
+        );
 
-          await ctx.reply(values.response);
-          return ctx.wizard.next();
-        });
+        break;
 
       case 'API_BLOCK':
         const query = values.entrance;
@@ -26,25 +33,18 @@ exports.createScene = (payload, bot) => {
 
         console.log(response);
 
-        return Telegraf.reply(response);
+        scheme.push(Telegraf.reply(response));
+        break;
     }
   });
 
-  const scene = new WizardScene(
-    'testingScene',
-    Telegraf.command(`/gay`, async ctx => {
-      await ctx.reply('gay is alright');
+  const handlerOne = Telegraf.command(`/test`, async ctx => {
+    await ctx.reply('it works huh ?');
+    return ctx.wizard.next();
+  });
 
-      return ctx.wizard.next();
-    }),
-    Telegraf.on('text', async ctx => {
-      console.log(ctx.message.chat.id, 'MESSAGE');
-      message = ctx.message.text;
-
-      return ctx.wizard.next();
-    }),
-    bot.telegram.sendMessage(ctx => ctx.message.chat.id, message),
-  );
+  // console.log(extractScenesFromArray(scheme));
+  const scene = new WizardScene('testingScene', ...[scheme]);
   scene.enter();
 
   const stage = new Stage([scene]);
@@ -55,7 +55,8 @@ exports.createScene = (payload, bot) => {
   bot.use(
     bot.start(ctx => {
       ctx.scene.enter('testingScene');
-      ctx.reply('I dunno');
+
+      ctx.reply(getStartCommand(payload));
     }),
   );
 };
