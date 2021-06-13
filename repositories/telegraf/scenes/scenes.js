@@ -4,15 +4,13 @@ const {
   Scenes: { WizardScene, Stage },
 } = require('telegraf');
 const { axiosGet } = require('../../../http');
-const {
-  extractScenesFromArray,
-} = require('../../../utils/bot/extractScenesFromArray');
 const { getStartCommand } = require('../../../utils/bot/getStartCommand');
+const JsonFind = require('json-find');
+const { createKeyboard, createInlineKeyboard } = require('../keyboards');
 
 exports.createScene = (payload, bot) => {
-  let message = '';
   let scheme = [];
-  const readyScene = [];
+  let keyboard = null;
 
   payload.forEach(({ type, values }) => {
     switch (type) {
@@ -20,6 +18,7 @@ exports.createScene = (payload, bot) => {
         scheme.push(
           Telegraf.command(`/${values.command}`, async ctx => {
             await ctx.reply(values.response);
+
             return ctx.wizard.next();
           }),
         );
@@ -28,18 +27,45 @@ exports.createScene = (payload, bot) => {
 
       case 'API_BLOCK':
         const query = values.entrance;
+        const key = values.key;
 
-        const response = async () => await axiosGet(query + message);
+        scheme.push(
+          Telegraf.on('text', async ctx => {
+            const response = await axiosGet(query + ctx.message.text);
 
-        console.log(response);
+            const jsonData = JsonFind(response.data);
+            console.log(jsonData.checkKey('url'));
 
-        scheme.push(Telegraf.reply(response));
+            await ctx.reply(JSON.stringify(response.data.data[0].url));
+
+            return ctx.wizard.next();
+          }),
+        );
+        break;
+
+      case 'KEYBOARD':
+        keyboard = createKeyboard(values.buttonList);
+
+        scheme.push(ctx => {
+          ctx.replyWithMarkdown('Keyboard updated', keyboard);
+
+          return ctx.wizard.next();
+        });
+        break;
+
+      case 'INLINE_KEYBOARD':
+        keyboard = createInlineKeyboard(values.buttonList);
+
+        scheme.push(ctx => {
+          Telegraf.on('text', keyboard);
+
+          return ctx.wizard.next();
+        });
         break;
     }
   });
 
-  // console.log(extractScenesFromArray(scheme));
-  const scene = new WizardScene('testingScene', ...scheme);
+  const scene = new WizardScene('scene', ...scheme);
   scene.enter();
 
   const stage = new Stage([scene]);
@@ -49,7 +75,7 @@ exports.createScene = (payload, bot) => {
 
   bot.use(
     bot.start(ctx => {
-      ctx.scene.enter('testingScene');
+      ctx.scene.enter('scene');
 
       ctx.reply(getStartCommand(payload));
     }),
