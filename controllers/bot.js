@@ -1,4 +1,5 @@
 const { Telegraf } = require('telegraf');
+const botModel = require('../models/bot');
 const { createScene } = require('../repositories/telegraf/scenes/scenes');
 
 let bot = null;
@@ -48,8 +49,14 @@ const buildScheme = (bot, data) => {
   return scheme;
 };
 
-exports.createBot = async (req, res) => {
-  // const { token, scheme } = req.body;
+exports.initializeBot = async (req, res) => {
+  const { token } = req.body;
+
+  botModel.create({
+    name: '',
+    token,
+    schemeId: 1,
+  });
 
   //1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8
   bot = new Telegraf('1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8');
@@ -60,6 +67,8 @@ exports.createBot = async (req, res) => {
 
   res.send({ ok: true, message: 'it worked' });
 };
+
+exports.launchBot = () => {};
 
 exports.saveBot = async (req, res) => {
   const data = req.body;

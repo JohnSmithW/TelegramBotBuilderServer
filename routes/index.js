@@ -9,10 +9,11 @@ const { isUserRegistered } = require('../middlewares/user');
 const { success, fail } = require('../repositories/passport');
 
 function routes() {
-  router.get('/bot/init', botController.createBot);
+  router.post('/bot/init', botController.initializeBot);
   router.post('/bot/save', botController.saveBot);
   router.post('/isAuthorized', session.isAuthorized);
   router.post('/signUp', isUserRegistered, userController.signUp);
+  router.post('/signIn', isUserRegistered, userController.signIn);
 
   router.get(
     '/google',
