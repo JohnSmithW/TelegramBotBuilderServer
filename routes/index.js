@@ -18,13 +18,12 @@ function routes() {
   router.get(
     '/google',
     passport.authenticate('google', { scope: ['profile', 'email', 'openid'] }),
-    success,
   );
 
   router.get(
     '/google/callback',
     passport.authenticate('google', { failureRedirect: '/authorization' }),
-    fail,
+    success,
   );
 
   return router;

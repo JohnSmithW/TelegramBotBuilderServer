@@ -18,6 +18,7 @@ exports.google = new GoogleStrategy(
       return userModel
         .create({
           name: userGoogle.name.givenName,
+          email: userGoogle.emails[0].value,
         })
         .then(res => done(null, res.dataValues));
     }
