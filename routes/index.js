@@ -11,7 +11,7 @@ const { success } = require('../repositories/passport');
 function routes() {
   router.post('/bot/init', botController.initializeBot);
   router.post('/bot/save', botController.saveBot);
-  router.post('/isAuthorized', session.isAuthorized);
+  router.get('/isAuthorized', session.isAuthorized);
   router.post('/signUp', isUserRegistered, userController.signUp);
   router.post('/signIn', isUserRegistered, userController.signIn);
 
