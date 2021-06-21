@@ -13,7 +13,7 @@ exports.signUp = async (req, res) => {
 
     req.session.isAuthorized = true;
 
-    res.redirect('/');
+    
   } else {
     res.send({
       ok: true,
@@ -25,8 +25,6 @@ exports.signUp = async (req, res) => {
 exports.signIn = (req, res) => {
   if (req.user) {
     req.session.isAuthorized = true;
-
-    res.redirect('/');
   } else {
     res.send({
       ok: true,
