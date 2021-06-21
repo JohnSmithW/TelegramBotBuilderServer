@@ -1,16 +1,17 @@
 const userModel = require('../models/user');
 const md5 = require('md5');
 
-exports.signUp = async (req, res, done) => {
+exports.signUp = async (req, res) => {
   if (!req.user) {
     const { name, email, password } = req.data;
-    let ok = false;
 
     userModel.create({
       name: name,
       email,
       password: md5(password),
     });
+
+    req.session.isAuthorized = true;
 
     res.redirect('/');
   } else {
@@ -23,6 +24,8 @@ exports.signUp = async (req, res, done) => {
 
 exports.signIn = (req, res) => {
   if (req.user) {
+    req.session.isAuthorized = true;
+
     res.redirect('/');
   } else {
     res.send({

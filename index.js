@@ -1,8 +1,6 @@
 const express = require('express');
 const PORT = process.env.PORT || 8080;
-const dev = process.env.NODE_ENV !== 'production';
 const app = express();
-const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
@@ -25,23 +23,9 @@ app.use(
   }),
 );
 
-// app.use(express.static(path.join(__dirname, './public')));
-
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/api', showRoutes(app));
-
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, './public/index.html'));
-// });
-
-// app.get('/constructor', (req, res) => {
-//   res.sendFile(path.join(__dirname, './public/constructor.html'));
-// });
-
-// app.get('/authorization', (req, res) => {
-//   res.sendFile(path.join(__dirname, './public/authorization.html'));
-// });
 
 server.listen(PORT, err => {
   if (err) throw err;

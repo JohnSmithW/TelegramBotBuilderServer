@@ -6,7 +6,7 @@ const botController = require('../controllers/bot');
 const session = require('../controllers/session');
 const userController = require('../controllers/user');
 const { isUserRegistered } = require('../middlewares/user');
-const { success, fail } = require('../repositories/passport');
+const { success } = require('../repositories/passport');
 
 function routes() {
   router.post('/bot/init', botController.initializeBot);
