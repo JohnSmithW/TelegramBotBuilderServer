@@ -9,7 +9,7 @@ require('./repositories/passport');
 
 const server = require('http').Server(app);
 
-app.use(cors());
+!process.env.PORT &&  app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
