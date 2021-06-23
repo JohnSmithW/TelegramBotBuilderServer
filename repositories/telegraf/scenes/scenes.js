@@ -4,9 +4,11 @@ const {
   Scenes: { WizardScene, Stage },
 } = require('telegraf');
 const { axiosGet } = require('../../../http');
+const _ = require('lodash');
+const { select, $each } = require('qim');
 const { getStartCommand } = require('../../../utils/bot/getStartCommand');
-const JsonFind = require('json-find');
 const { createKeyboard, createInlineKeyboard } = require('../keyboards');
+const { formatData } = require('../../../utils/bot/formatData');
 
 exports.createScene = (payload, bot) => {
   let scheme = [];
@@ -26,17 +28,41 @@ exports.createScene = (payload, bot) => {
         break;
 
       case 'API_BLOCK':
-        const query = values.entrance;
-        const key = values.key;
+        const { entrance, entry, variableList } = values;
+
+        // (async () => {
+        //   const response = await axiosGet(entrance + 'cat');
+
+        //   const data = variableList.map(({ key }) =>
+        //     select([entry, $each, key], response.data),
+        //   );
+
+        //   console.log(formatData(varList, data));
+        // })();
 
         scheme.push(
           Telegraf.on('text', async ctx => {
-            const response = await axiosGet(query + ctx.message.text);
+            const varList = variableList.map(({ variable }) => variable);
+            const response = await axiosGet(entrance + ctx.message.text);
 
-            const jsonData = JsonFind(response.data);
-            console.log(jsonData.checkKey('url'));
+            const data = variableList.map(({ key }) =>
+              select([entry, $each, key], response.data),
+            );
 
-            await ctx.reply(JSON.stringify(response.data.data[0].url));
+            formatData(varList, data);
+
+            // await ctx.replyWithHTML(
+            //   'hey<a href="https://homepages.cae.wisc.edu/~ece533/images/airplane.png">""</a>',
+            // );
+
+            await ctx.replyWithPhoto(
+              {
+                url: 'https://homepages.cae.wisc.edu/~ece533/images/airplane.png',
+              },
+              {
+                caption: `cat photo\ngay`,
+              },
+            );
 
             return ctx.wizard.next();
           }),

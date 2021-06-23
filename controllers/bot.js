@@ -52,11 +52,11 @@ const buildScheme = (bot, data) => {
 exports.initializeBot = async (req, res) => {
   const { token } = req.body;
 
-  botModel.create({
-    name: '',
-    token,
-    schemeId: 1,
-  });
+  // botModel.create({
+  //   name: '',
+  //   token,
+  //   schemeId: 1,
+  // });
 
   //1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8
   bot = new Telegraf('1789798446:AAEWI5CjfOLGeGMxpaVBqunx1WhS0TRcVS8');

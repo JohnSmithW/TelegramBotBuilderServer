@@ -1,30 +1,32 @@
 const express = require('express');
+const session = require('express-session');
 const PORT = process.env.PORT || 8080;
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const passport = require('passport');
-const cookieSession = require('cookie-session');
 require('./repositories/passport');
 
 const server = require('http').Server(app);
 
-!process.env.PORT &&  app.use(cors());
+!process.env.PORT && app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const showRoutes = require('./routes/index.js');
 
+app.set('trust proxy', 1);
 app.use(
-  cookieSession({
-    name: 'session',
-    keys: ['secret'],
-    maxAge: 24 * 60 * 60 * 1000,
+  session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    // cookie: { secure: true },
   }),
 );
 
 app.use(passport.initialize());
-app.use(passport.session());
+
 app.use('/api', showRoutes(app));
 
 server.listen(PORT, err => {
