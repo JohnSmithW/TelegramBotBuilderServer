@@ -5,8 +5,6 @@ const md5 = require('md5');
 exports.local = new LocalStrategy(
   {
     usernameField: 'email',
-    passwordField: 'password',
-    passReqToCallback: true,
   },
   function (email, password, done) {
     userModel.findOne(

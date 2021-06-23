@@ -1,10 +1,10 @@
 const passport = require('passport');
 const { google } = require('./google');
-// const { local } = require('./local');
+const { local } = require('./local');
 require('dotenv').config();
 
 passport.use(google);
-// passport.use(local);
+passport.use(local);
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));

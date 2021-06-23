@@ -49,20 +49,20 @@ exports.createScene = (payload, bot) => {
               select([entry, $each, key], response.data),
             );
 
-            formatData(varList, data);
+            ctx.session.variableList = formatData(varList, data);
 
             // await ctx.replyWithHTML(
             //   'hey<a href="https://homepages.cae.wisc.edu/~ece533/images/airplane.png">""</a>',
             // );
 
-            await ctx.replyWithPhoto(
-              {
-                url: 'https://homepages.cae.wisc.edu/~ece533/images/airplane.png',
-              },
-              {
-                caption: `cat photo\ngay`,
-              },
-            );
+            // await ctx.replyWithPhoto(
+            //   {
+            //     url: 'https://homepages.cae.wisc.edu/~ece533/images/airplane.png',
+            //   },
+            //   {
+            //     caption: `cat photo\ngay`,
+            //   },
+            // );
 
             return ctx.wizard.next();
           }),
@@ -72,8 +72,8 @@ exports.createScene = (payload, bot) => {
       case 'KEYBOARD':
         keyboard = createKeyboard(values.buttonList);
 
-        scheme.push(ctx => {
-          ctx.replyWithMarkdown('Keyboard updated', keyboard);
+        scheme.push(async ctx => {
+          await ctx.replyWithMarkdown('Keyboard updated', keyboard);
 
           return ctx.wizard.next();
         });
@@ -82,12 +82,36 @@ exports.createScene = (payload, bot) => {
       case 'INLINE_KEYBOARD':
         keyboard = createInlineKeyboard(values.buttonList);
 
-        scheme.push(ctx => {
-          Telegraf.on('text', keyboard);
+        scheme.push(async ctx => {
+          await Telegraf.on('text', keyboard);
 
           return ctx.wizard.next();
         });
         break;
+
+      case 'PRODUCT_BLOCK':
+        scheme.push(async ctx => {
+          const list = ctx.session.variableList;
+
+          console.log(list[0][values.img]);
+
+          if (values.img && values.im !== '') {
+            const imgList = list.map(item => item[values.img]);
+
+            console.log(imgList);
+
+            imgList.map(img =>
+              ctx.replyWithPhoto(
+                {
+                  url: img,
+                },
+                {
+                  caption: `cat photo\ngay`,
+                },
+              ),
+            );
+          }
+        });
     }
   });
 
